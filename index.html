@@ -130,6 +130,32 @@ nav .links a{color:inherit;text-decoration:none}nav .links a:hover{color:var(--i
 .miss{list-style:none;padding:0;margin:0;display:grid;gap:10px}
 .miss li{background:rgba(20,10,36,.55);border:1px solid var(--line);border-left:3px solid var(--bad);border-radius:12px;padding:10px 14px;font-size:16px}
 .miss em{color:var(--ok);font-style:normal;font-weight:700}
+.ghost:disabled{opacity:.4;cursor:default;border-color:var(--line)}
+/* chapter tests */
+.tests{position:relative;z-index:1;padding-bottom:50px}
+.tests>h2{font-size:clamp(26px,3.4vw,34px);margin:0 0 6px;text-shadow:0 0 20px rgba(201,155,255,.35)}
+.tgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.tcard{display:flex;flex-direction:column;gap:6px;padding:20px}
+.tcard .num{font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--v2)}
+.tcard h3{font:700 21px/1.2 Philosopher,serif;color:var(--ink);margin:0}
+.tcard p{margin:0;color:var(--muted);font-size:15px;line-height:1.4}
+.tcard .meta b{color:var(--v2)}
+.tcard button{margin-top:auto;align-self:flex-start}
+.tcard .meta{margin-bottom:12px}
+.tcard.full{background:linear-gradient(160deg,#4a2585,var(--panel2) 60%,var(--panel));border-color:var(--v2)}
+.qnav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.qnav button{min-height:34px;min-width:34px;padding:0 6px;font-size:14px;font-weight:700;border-radius:10px;background:rgba(255,255,255,.04);border:1.5px solid var(--line);color:var(--muted)}
+.qnav button.a{background:rgba(160,92,240,.32);color:var(--ink)}
+.qnav button.cur{border-color:var(--v2);color:var(--ink);box-shadow:0 0 12px rgba(160,92,240,.6)}
+.opt.pick{border-color:var(--v2);background:rgba(160,92,240,.3);box-shadow:0 0 14px rgba(160,92,240,.45)}
+.brk{list-style:none;padding:0;margin:0 0 6px;display:grid;gap:9px;max-width:620px}
+.brk li{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;gap:12px;align-items:center;font-size:15.5px}
+.brk .bt{height:8px;background:rgba(255,255,255,.08);border-radius:9px;overflow:hidden}
+.brk .bt i{display:block;height:100%;background:linear-gradient(90deg,var(--v3),var(--v2))}
+.brk b{font-family:Philosopher,serif;color:var(--v2);min-width:3.5ch;text-align:right}
+.miss li.good{border-left-color:var(--ok)}
+@media(max-width:900px){.tgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.tgrid{grid-template-columns:1fr}.brk li{grid-template-columns:minmax(0,1fr) 70px auto}}
 footer{text-align:center;color:var(--muted);font-size:14px;padding:0 16px 30px;position:relative;z-index:1}
 @media(max-width:900px){.trio{grid-template-columns:1fr;justify-items:center;text-align:center}.sigil{max-width:360px;order:-1}.side,.side.r{text-align:center}.ladder{max-width:300px;margin-inline:auto}.panels{grid-template-columns:1fr}nav .links{display:none}nav .pillbtn{margin-left:auto}.p4,.p5,.p6{display:none}}
 @media(max-width:640px){.modes{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:20px}.mode:nth-child(3)::before{display:none}.mode svg{width:92px;height:92px}.opts{grid-template-columns:1fr}.p1{width:220px;height:220px;left:-120px;top:-110px}.p2{width:70px;height:70px;top:70px}.p3{display:none}.tile{font-size:15px;padding:8px}.recs{max-width:none}}
@@ -141,7 +167,7 @@ footer{text-align:center;color:var(--muted);font-size:14px;padding:0 16px 30px;p
 <div class="wrap">
 <nav>
   <div class="logo"><svg viewBox="0 0 34 34"><rect x="7" y="7" width="20" height="20" transform="rotate(45 17 17)" fill="none" stroke="#c99bff" stroke-width="2"/><rect x="12" y="12" width="10" height="10" transform="rotate(45 17 17)" fill="#a05cf0"/></svg>Myth Trials</div>
-  <div class="links"><a href="#trials">Trials</a><a href="#prepare">Prepare</a><a href="#records">Records</a></div>
+  <div class="links"><a href="#trials">Trials</a><a href="#prepare">Prepare</a><a href="#records">Records</a><a href="#tests">Tests</a></div>
   <button class="pillbtn" id="navGo">Play</button>
 </nav>
 <section class="hero">
@@ -187,6 +213,9 @@ const Q=[
 ["F",3,"Where did Hamilton take the story of Persephone and the narcissus from?","A Homeric Hymn",["Ovid","Apuleius","Theocritus"],"The Hymn tells it simply and objectively, unlike Ovid."],
 ["F",3,"Which two poets are Hamilton’s sources for Adonis?","Theocritus and Bion",["Ovid and Virgil","Homer and Hesiod","Apuleius and Ovid"],"Third-century Alexandrian poets: tender, a little soft, always in good taste."],
 ["F",3,"What dark custom may lie behind the flower myths, according to Hamilton?","Killing a villager so his blood would make barren fields fruitful",["Burning temples in spring","Exiling beautiful young men","Throwing flowers into graves"],"Later the cruel part was forgotten and the youth was said to have died by accident."],
+["F",1,"What did the nymphs find where Narcissus had died?","A new and lovely flower",["His body turned to stone","A spring of clear water","A laurel tree"],"They could not find his body, only the flower that bears his name."],
+["F",2,"What became of Echo after Narcissus rejected her?","She wasted away until only her voice was left",["She was turned into a bird","She drowned in the pool","She became a servant of Persephone"],"She hid in lonely caves and pined away; only her voice lived on."],
+["F",2,"Where did Aphrodite hide the infant Adonis?","In a chest she gave Persephone to keep",["In a cave on Cyprus","Inside a myrtle tree","In her temple at Paphos"],"Persephone looked inside, loved him too, and refused to give him back."],
 ["P",3,"Who is the only ancient writer who tells the story of Cupid and Psyche?","Apuleius",["Ovid","Homer","Theocritus"],"A Latin writer of the 2nd century AD, which is why Latin names are used."],
 ["P",1,"Why was Venus angry with Psyche?","People worshipped Psyche’s beauty and neglected Venus",["Psyche insulted her temple","Psyche stole her golden apple","Psyche refused to marry"],"Venus’ temples were neglected and her altars full of cold ashes."],
 ["P",1,"What did Venus order Cupid to do to Psyche?","Make her fall in love with the vilest creature in the world",["Kill her with an arrow","Bring her to Olympus","Turn her into a bird"],"But when Cupid saw Psyche, it was as if he had shot himself with his own arrow."],
@@ -204,6 +233,9 @@ const Q=[
 ["P",2,"How did Psyche become immortal?","Jupiter gave her ambrosia",["Venus kissed her","She bathed in the Styx","Cupid shot her with a golden arrow"],"Mercury brought her to Olympus and Jupiter made her immortal."],
 ["P",3,"Why could Venus accept the marriage in the end?","With Psyche in heaven, she would no longer draw men away from Venus’ worship",["Jupiter threatened her","Cupid promised to leave","Psyche became her servant forever"],"A daughter-in-law in heaven was no rival on earth."],
 ["P",2,"What do Cupid and Psyche stand for?","Love and the Soul",["Beauty and Envy","Spring and Death","Day and Night"],"Psyche is the Greek word for soul."],
+["P",1,"How was Psyche served in the enchanted palace?","By invisible voices",["By nymphs of Venus","By her two sisters","By Zephyr alone"],"She heard voices and was waited on, but saw no one."],
+["P",2,"What did Venus send Psyche to ask Proserpine for?","A little of her beauty, in a box",["Water from Lethe","A golden apple","A cake for Cerberus"],"Venus claimed she had worn herself out nursing her injured son."],
+["P",2,"Who woke Psyche from the deathlike sleep?","Cupid",["Mercury","Venus","Zephyr"],"He wiped the sleep from her face and shut it back in the box."],
 ["Y",1,"In which city did Pyramus and Thisbe live?","Babylon",["Athens","Thebes","Troy"],"Their houses stood side by side."],
 ["Y",1,"How did Pyramus and Thisbe talk to each other?","Through a chink in the wall between their houses",["Through letters","Through a servant","In a temple"],"The hateful wall became their way of reaching each other."],
 ["Y",2,"Where did they agree to meet?","Under a mulberry tree by the tomb of Ninus",["At the city gate","Beside the river Euphrates","In the temple of Venus"],"The tree was full of snow-white berries."],
@@ -274,6 +306,7 @@ const TF=[
 ["F","Adonis was killed by a lion.",false,"A wild boar gored him."],
 ["F","Adonis spent spring and summer with Aphrodite.",true,"Autumn and winter with Persephone."],
 ["F","The anemone grew from Adonis’ blood.",true,"The blood-red windflower."],
+["F","Echo wasted away until only her voice remained.",true,"She hid in lonely caves."],
 ["P","Psyche was the eldest of three daughters.",false,"She was the youngest."],
 ["P","Cupid fell in love with Psyche as soon as he saw her.",true,"As if he had shot his own heart."],
 ["P","Psyche saw her husband every night.",false,"She never saw him until the lamp."],
@@ -282,6 +315,8 @@ const TF=[
 ["P","An eagle fetched the water of the Styx.",true,"Only a winged creature could reach it."],
 ["P","Psyche never opened Proserpine’s box.",false,"She opened it and fell into a deathlike sleep."],
 ["P","Mercury made Psyche immortal with ambrosia.",false,"Jupiter gave her ambrosia; Mercury only brought her."],
+["P","Psyche’s two elder sisters had married kings.",true,"Psyche, the loveliest, had no suitor at all."],
+["P","Venus woke Psyche from the deathlike sleep.",false,"Cupid woke her and put the sleep back in the box."],
 ["Y","Pyramus and Thisbe lived in Athens.",false,"They lived in Babylon."],
 ["Y","They met by the tomb of Ninus.",true,"Under a white mulberry tree."],
 ["Y","Mulberries were once white.",true,"The lovers’ blood turned them dark red."],
@@ -424,12 +459,18 @@ function setup(focusSel){
     <ul class="recs">${MODES.map(m=>`<li><span>${m[1]}</span><b>${save.best[m[0]]||"—"}</b></li>`).join("")}<li><span>Total XP</span><b>${save.xp}</b></li></ul>
     <button class="ghost" id="reset" style="margin-top:22px;font-size:14px;min-height:36px;padding:4px 16px">Reset progress</button>
    </div>
+  </section>
+  <section class="tests" id="tests">
+   <h2>Chapter tests</h2>
+   <p class="note" style="margin:0 0 16px;max-width:75ch">Pages 109–155, from “The Flower-Myths” up to “The Quest of the Golden Fleece”. Exam style: no lives and no hints. Answer in any order, change your mind freely, then submit for your grade and a full review.</p>
+   <div class="tgrid">${CH.map((c,j)=>{const r=(save.tests||{})[c[0]];return `<div class="panel tcard${c[0]==="full"?" full":""}"><span class="num">${c[0]==="full"?"All chapters":"Test "+(j+1)}</span><h3>${c[1]}</h3><p>${c[2]}</p><p class="meta">${testLen(c[0])} questions · ${r?`Best <b>${r.best}%</b> · ${r.tries} ${r.tries>1?"attempts":"attempt"}`:"Not taken yet"}</p><button class="pillbtn" data-test="${c[0]}">Start test</button></div>`}).join("")}</div>
   </section>`;
+  view.querySelectorAll("[data-test]").forEach(b=>b.onclick=()=>test(b.dataset.test));
   view.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{setCfg("mode",b.dataset.mode);setup(`[data-mode="${b.dataset.mode}"]`);document.getElementById("trials").scrollIntoView({block:"nearest"})});
   view.querySelectorAll("[data-diff]").forEach(b=>b.onclick=()=>{setCfg("diff",b.dataset.diff);setup(`[data-diff="${b.dataset.diff}"]`)});
   view.querySelectorAll("[data-story]").forEach(b=>b.onclick=()=>{setCfg("story",b.dataset.story);setup(`[data-story="${b.dataset.story}"]`)});
   document.getElementById("go").onclick=start;
-  document.getElementById("reset").onclick=()=>{if(!confirm("Reset all XP and best scores? This cannot be undone."))return;save.xp=0;save.best={};persist();sigil();setup("#reset")};
+  document.getElementById("reset").onclick=()=>{if(!confirm("Reset all XP, best scores and test results? This cannot be undone."))return;save.xp=0;save.best={};save.tests={};persist();sigil();setup("#reset")};
   if(typeof focusSel==="string")view.querySelector(focusSel)?.focus({preventScroll:true});
 }
 /* nav links and logo work from any screen */
@@ -456,6 +497,98 @@ function results(title,big,stats,missHtml,mode,score,xp,retry,noBest){
 const escQuit=e=>{if(e.key==="Escape"){setup();return true}return false};
 /* timers skip ticks while the tab is hidden */
 const tick=(f,ms)=>setInterval(()=>{if(!document.hidden)f()},ms);
+
+/* ---------- chapter tests ---------- */
+/* [id, title, subtitle, story keys, multiple-choice count, true/false count] */
+const CH=[
+ ["flower","The Flower-Myths","Narcissus and Echo, Hyacinthus, Adonis",["F"],10,5],
+ ["psyche","Cupid and Psyche","The tale told only by Apuleius",["P"],10,5],
+ ["tales","Eight Brief Tales of Lovers","Pyramus and Thisbe to Alpheus and Arethusa",["Y","O","C","G","B","E","D","A"],18,7],
+ ["full","Full exam","All three chapters, in book order",null,0,0]
+];
+const FULL=[["flower",6,3],["psyche",6,3],["tales",8,4]];
+const chOf=k=>CH.find(c=>c[3]&&c[3].includes(k));
+const testLen=id=>id==="full"?FULL.reduce((s,f)=>s+f[1]+f[2],0):(c=>c[4]+c[5])(CH.find(c=>c[0]===id));
+/* take n rows round-robin across stories so every tale is covered */
+const spread=(rows,keys,n)=>{const g=keys.map(k=>shuffle(rows.filter(r=>r[0]===k)));const out=[];let any=true;while(out.length<n&&any){any=false;for(const a of shuffle(g)){if(a.length&&out.length<n){out.push(a.shift());any=true}}}return out};
+function buildTest(id){
+  const part=(cid,m,t)=>{const c=CH.find(x=>x[0]===cid);
+    const mc=spread(Q,c[3],m).map(r=>({t:"mc",k:r[0],q:r[2],opts:shuffle([r[3],...r[4]]),cor:r[3],why:r[5]}));
+    const tfs=spread(TF,c[3],t).map(s=>({t:"tf",k:s[0],q:s[1],opts:["True","False"],cor:s[2]?"True":"False",why:s[3]}));
+    return shuffle(mc.concat(tfs))};
+  if(id==="full")return FULL.flatMap(f=>part(...f));
+  const c=CH.find(x=>x[0]===id);return part(id,c[4],c[5]);
+}
+function test(id,given){
+  stop();const V=board();const c=CH.find(x=>x[0]===id);
+  const items=(given?shuffle(given).map(x=>({...x,opts:x.t==="mc"?shuffle(x.opts):x.opts})):buildTest(id)).map(x=>({...x,ans:null}));
+  const n=items.length;let i=0,sec=0;
+  const answered=()=>items.filter(x=>x.ans!==null).length;
+  const leave=()=>{if(answered()&&!confirm("Leave this test? Your answers will be lost."))return;setup();goSection("tests")};
+  const submit=()=>{const un=n-answered();if(un&&!confirm(`${un} question${un>1?"s are":" is"} still unanswered. Submit anyway?`))return;testResults(id,items,sec,!!given)};
+  const go=j=>{i=Math.max(0,Math.min(n-1,j));draw()};
+  const choose=k=>{const it=items[i],fresh=it.ans===null;it.ans=it.opts[k];draw(`.opt[data-k="${k}"]`);
+    if(fresh&&i<n-1)setTimeout(()=>{if(V.isConnected&&items[i]===it)go(i+1)},280)};
+  const draw=focusSel=>{
+    const it=items[i];
+    V.innerHTML=`<div class="hud"><div class="l"><span class="pill">${c[1]}${given?" · retry":""}</span><span class="pill" id="tt">${fmt(sec)}</span><span class="pill">${answered()}/${n} answered</span></div><div class="l"><button class="ghost" id="qx" style="min-height:36px;padding:4px 14px">Leave</button></div></div>
+    <div class="qnav">${items.map((x,j)=>`<button data-j="${j}" class="${x.ans!==null?"a":""}${j===i?" cur":""}" aria-label="Question ${j+1}${x.ans!==null?", answered":""}"${j===i?' aria-current="step"':""}>${j+1}</button>`).join("")}</div>
+    ${tagOf(it.k)}<span class="tag d">${it.t==="mc"?"Multiple choice":"True or false"}</span>
+    <p class="q"><span style="color:var(--muted)">${i+1}.</span> ${it.q}</p>
+    <div class="opts">${it.opts.map((o,k)=>`<button class="opt${it.ans===o?" pick":""}" data-k="${k}" aria-pressed="${it.ans===o}"><kbd>${it.t==="tf"?"TF"[k]:k+1}</kbd><span>${o}</span></button>`).join("")}</div>
+    <div class="row" style="justify-content:space-between;margin-top:20px"><div class="row" style="margin:0"><button class="ghost" id="pv"${i===0?" disabled":""}>← Previous</button><button class="ghost" id="nv"${i===n-1?" disabled":""}>Next →</button></div><button class="pillbtn" id="sub">Submit test</button></div>
+    <p class="note" style="text-align:center;margin-top:14px">Answers are checked only when you submit. Keys: 1–4 or T / F to answer, ← → to move, Enter for next, Esc to leave.</p>`;
+    V.querySelectorAll(".opt").forEach(b=>b.onclick=()=>choose(+b.dataset.k));
+    V.querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>{i=+b.dataset.j;draw(`[data-j="${i}"]`)});
+    document.getElementById("pv").onclick=()=>go(i-1);
+    document.getElementById("nv").onclick=()=>go(i+1);
+    document.getElementById("sub").onclick=submit;
+    document.getElementById("qx").onclick=leave;
+    if(focusSel)V.querySelector(focusSel)?.focus({preventScroll:true});
+  };
+  onKey(e=>{
+    if(e.key==="Escape"){leave();return}
+    if(e.key==="Enter"&&e.target.closest&&e.target.closest("button"))return;
+    const it=items[i],k=e.key.toLowerCase();
+    if(it.t==="mc"){const d=+e.key;if(d>=1&&d<=4)choose(d-1)}
+    else if(k==="t"||k==="1")choose(0);else if(k==="f"||k==="2")choose(1);
+    if(e.key==="ArrowLeft"&&i>0)go(i-1);
+    else if(e.key==="ArrowRight"&&i<n-1)go(i+1);
+    else if(e.key==="Enter"){if(i<n-1)go(i+1);else submit()}
+  });
+  timer=tick(()=>{sec++;const e=document.getElementById("tt");if(e)e.textContent=fmt(sec)},1000);
+  draw();
+}
+function testResults(id,items,sec,isRetry){
+  stop();const c=CH.find(x=>x[0]===id),n=items.length;
+  const isOk=x=>x.ans===x.cor;
+  const right=items.filter(isOk).length,pct=Math.round(right/n*100),wrong=items.filter(x=>!isOk(x));
+  const G=pct>=90?["A","Olympian"]:pct>=80?["B","Demigod"]:pct>=70?["C","Hero"]:pct>=60?["D","Mortal"]:["F","Shade of Hades"];
+  let nb=false;
+  if(!isRetry){save.tests=save.tests||{};const r=save.tests[id]||{best:0,tries:0};nb=r.tries>0&&pct>r.best;r.best=Math.max(r.best,pct);r.tries++;r.last=pct;save.tests[id]=r;persist()}
+  const xp=isRetry?right*2:right*4+(pct>=80?20:0);addXP(xp);
+  /* breakdown: by chapter for the full exam, by story for the tales, by question type otherwise */
+  const gk=id==="full"?x=>chOf(x.k)[1]:id==="tales"?x=>ST[x.k]:x=>x.t==="mc"?"Multiple choice":"True or false";
+  const groups=new Map();items.forEach(x=>{const g=gk(x);if(!groups.has(g))groups.set(g,[0,0]);const a=groups.get(g);a[1]++;if(isOk(x))a[0]++});
+  const V=board();
+  V.innerHTML=`<h2>${c[1]}${isRetry?" · retry":""}</h2><div class="big">${pct}%</div>
+  <div class="stats"><span class="pill">Grade ${G[0]} · ${G[1]}</span><span class="pill">${right}/${n} correct</span><span class="pill">Time ${fmt(sec)}</span><span class="pill">+${xp} XP</span>${nb?'<span class="pill" style="background:var(--v);border-color:var(--v2)">New best!</span>':""}</div>
+  <h3>Breakdown</h3><ul class="brk">${[...groups].map(([g,[a,b]])=>`<li><span>${g}</span><span class="bt"><i style="width:${a/b*100}%"></i></span><b>${a}/${b}</b></li>`).join("")}</ul>
+  <div class="row" style="margin-top:18px"><h3 style="margin:0">Review</h3><div class="seg" style="margin-left:auto"><button data-f="w" aria-pressed="${!!wrong.length}">Mistakes (${wrong.length})</button><button data-f="a" aria-pressed="${!wrong.length}">All questions</button></div></div>
+  <div id="rv" style="margin-top:12px"></div>
+  <div class="row"><button class="pillbtn go" id="rt" style="margin-top:8px">Take a new test</button>${wrong.length?'<button class="ghost" id="rw" style="margin-top:8px">Retry wrong answers (R)</button>':""}<button class="ghost" id="bk" style="margin-top:8px">Back to tests (Esc)</button></div>`;
+  const review=f=>{const list=items.map((x,j)=>[x,j]).filter(([x])=>f==="a"||!isOk(x));
+    document.getElementById("rv").innerHTML=list.length?`<ul class="miss">${list.map(([x,j])=>{const ok=isOk(x);return `<li class="${ok?"good":""}"><b>${j+1}. ${x.q}</b><br>${ok?"✓":"✗"} Your answer: ${x.ans??"<i>no answer</i>"}${ok?"":`<br>Correct: <em>${x.cor}</em>`} · ${x.why}</li>`}).join("")}</ul>`:"<p>No mistakes. The gods approve.</p>";
+    V.querySelectorAll("[data-f]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.f===f))};
+  V.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>review(b.dataset.f));
+  review(wrong.length?"w":"a");
+  const back=()=>{setup();goSection("tests")},retry=()=>test(id,wrong);
+  document.getElementById("rt").onclick=()=>test(id);
+  document.getElementById("bk").onclick=back;
+  if(wrong.length)document.getElementById("rw").onclick=retry;
+  document.getElementById("rt").focus({preventScroll:true});
+  onKey(e=>{if(e.key==="Escape")back();else if(e.key.toLowerCase()==="r"&&wrong.length)retry()});
+}
 
 function quiz(only){
   stop();const V=board();const isRetry=Array.isArray(only);

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Myth Trials</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: mystical, nocturnal, playful study game
+   IDEA: an astral oracle chart: the planets of the myths orbit a glowing sigil that holds your rank
+   PICTURE: central rotating sigil with Greek names + XP ring, planets drifting in a starfield, planet medallions for modes
+   COLOUR and TYPE: deep violet night, glowing lavender, small jewel planets (green, coral, moon-blue); Philosopher + Alegreya Sans
+   LAYOUT: nav, three-column hero (rank / sigil / start), medallion row, two panels */
+:root{color-scheme:dark;--bg:#140a24;--bg2:#1d1033;--panel:#2a1748;--panel2:#3a2163;--ink:#f3ecff;--muted:#bba9da;--v:#a05cf0;--v2:#c99bff;--v3:#7b3fd1;--line:rgba(201,155,255,.28);--ok:#4fd18b;--bad:#ff6b7a;--coral:#ee7a52;--moon:#8ea3e6}
+:root[data-theme=light],:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;color:var(--ink);font:17px/1.55 "Alegreya Sans",system-ui,sans-serif;overflow-x:clip;min-height:100vh;
+ background:radial-gradient(1px 1px at 20px 30px,#fff8,transparent),radial-gradient(1px 1px at 90px 140px,#fff6,transparent),radial-gradient(1.5px 1.5px at 160px 60px,#d9c2ff,transparent),radial-gradient(1px 1px at 130px 190px,#fff5,transparent),radial-gradient(1px 1px at 50px 110px,#fff4,transparent),radial-gradient(ellipse at 50% 20%,#2c1650 0%,transparent 60%),var(--bg);
+ background-size:200px 210px,200px 210px,200px 210px,200px 210px,200px 210px,100% 100%,auto}
+h1,h2,h3,.ph{font-family:Philosopher,Georgia,serif}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;min-height:44px;color:inherit}
+button:focus-visible{outline:3px solid var(--v2);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 max(4vw,16px);position:relative}
+nav{display:flex;align-items:center;gap:20px;padding:20px 0 16px;border-bottom:1px solid var(--line);position:relative;z-index:2}
+.logo{display:flex;align-items:center;gap:10px;font:700 18px Philosopher,serif;letter-spacing:.04em}
+.logo svg{width:34px;height:34px}
+nav .links{display:flex;gap:26px;margin-left:auto;color:var(--muted);font-size:15px}
+nav .links a{color:inherit;text-decoration:none}nav .links a:hover{color:var(--ink)}
+.pillbtn{background:linear-gradient(180deg,var(--v),var(--v3));padding:8px 22px;font-weight:700;font-size:15px;box-shadow:0 0 18px rgba(160,92,240,.55)}
+.pillbtn:hover{filter:brightness(1.12)}
+.ghost{background:transparent;border:1.5px solid var(--line);padding:8px 20px;color:var(--ink)}
+.ghost:hover{border-color:var(--v2)}
+/* planets */
+.planet{position:absolute;border-radius:50%;pointer-events:none;z-index:0}
+.p1{width:330px;height:330px;left:-150px;top:-150px;background:radial-gradient(circle at 62% 66%,#d9a4f2,#9b56c9 45%,#4e2275 78%);box-shadow:0 0 60px rgba(190,120,240,.35)}
+.p1::after{content:"";position:absolute;inset:44% -30% 30% -10%;border:7px solid rgba(220,180,255,.35);border-radius:50%;transform:rotate(-28deg)}
+.p2{width:120px;height:120px;right:-30px;top:110px;background:radial-gradient(circle at 35% 35%,#c6d2ff,#7f92dc 50%,#38407e 85%)}
+.p3{width:30px;height:30px;right:200px;top:95px;background:radial-gradient(circle at 35% 35%,#ff9a7a,#c8452f 70%)}
+.p4{width:34px;height:34px;left:2.5%;top:660px;background:radial-gradient(circle at 35% 35%,#c89aff,#6a35a8 75%)}
+.p5{width:16px;height:16px;left:30%;top:262px;background:radial-gradient(circle at 35% 35%,#8ff0b8,#2b8a57 75%)}
+.p6{width:22px;height:22px;right:3%;top:700px;background:radial-gradient(circle at 35% 35%,#f4dde6,#a58197 75%)}
+/* hero */
+.hero{position:relative;z-index:1;padding:34px 0 10px;text-align:center}
+.hero h1{font-size:clamp(40px,7vw,68px);line-height:1.02;margin:0;text-shadow:0 0 30px rgba(201,155,255,.45)}
+.hero .lead{color:var(--muted);max-width:60ch;margin:12px auto 0}
+.trio{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px) minmax(0,1fr);gap:24px;align-items:center;margin-top:10px;text-align:left}
+.side h2{font-size:26px;line-height:1.15;margin:0 0 10px}
+.side p{color:var(--muted);margin:0 0 18px;font-size:16px}
+.side.r{text-align:left}
+.sigil{position:relative;aspect-ratio:1;width:100%}
+.sigil svg{position:absolute;inset:0;width:100%;height:100%}
+.spin{transform-origin:220px 220px;animation:spin 120s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ladder{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:6px;font-size:15px}
+.ladder li{display:flex;justify-content:space-between;gap:10px;color:var(--muted);border-bottom:1px dashed var(--line);padding-bottom:4px}
+.ladder li.on{color:var(--ink);font-weight:700}
+/* medallion modes */
+.modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:36px 0 34px;position:relative;z-index:1}
+.mode{background:none;border-radius:20px;display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 14px 14px;gap:6px;position:relative}
+.mode+.mode::before{content:"";position:absolute;left:0;bottom:14px;height:60px;border-left:1px solid var(--line)}
+.mode svg{width:118px;height:118px;transition:transform .3s,filter .3s}
+.mode strong{font:700 20px Philosopher,serif;margin-top:6px}
+.mode span{color:var(--muted);font-size:14.5px;line-height:1.35;max-width:22ch}
+.mode .best{color:var(--v2);font-weight:700}
+.mode:hover svg{transform:translateY(-4px)}
+.mode[aria-pressed=true] svg{filter:drop-shadow(0 0 16px rgba(201,155,255,.85))}
+.mode[aria-pressed=true] strong{color:var(--v2)}
+/* panels */
+.panels{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;position:relative;z-index:1;padding-bottom:50px}
+.panel{background:linear-gradient(160deg,var(--panel2),var(--panel) 55%,#22123d);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,3vw,30px);position:relative;overflow:hidden}
+.panel h2{font-size:26px;margin:0 0 6px}
+.panel h3{font:700 16px "Alegreya Sans";color:var(--muted);margin:18px 0 8px}
+.deco{position:absolute;pointer-events:none;opacity:.55}
+.mount{left:0;bottom:0;width:62%;height:120px}
+.swirl{right:-20px;bottom:-20px;width:260px;height:260px}
+.panel>*:not(.deco){position:relative}
+.seg,.chips{display:flex;flex-wrap:wrap;gap:8px}
+.seg button,.chip{background:rgba(255,255,255,.04);border:1.5px solid var(--line);padding:6px 16px;font-size:15.5px}
+.seg button[aria-pressed=true],.chip[aria-pressed=true]{background:var(--v);border-color:var(--v2);box-shadow:0 0 14px rgba(160,92,240,.5)}
+.note{font-size:14px;color:var(--muted);margin:8px 0 0}
+.go{margin-top:22px;font-size:18px;padding:12px 34px}
+.recs{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px;max-width:280px}
+.recs li{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.recs b{color:var(--v2);font-family:Philosopher,serif;font-size:19px}
+/* play */
+.play{margin:30px 0 50px}
+.hud{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;margin-bottom:14px;font-weight:700}
+.hud .l{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.hearts{color:var(--bad);font-size:22px;letter-spacing:2px;text-shadow:0 0 10px rgba(255,107,122,.6)}
+.pill{background:rgba(255,255,255,.07);border:1px solid var(--line);padding:3px 12px;border-radius:999px;font-size:15px;white-space:nowrap}
+.bar{height:6px;background:rgba(255,255,255,.08);border-radius:9px;overflow:hidden;margin-bottom:20px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--v3),var(--v2));box-shadow:0 0 10px var(--v);transition:width .3s}
+.tag{display:inline-block;font-size:13.5px;font-weight:700;color:var(--v2);border:1px solid var(--line);background:rgba(160,92,240,.15);padding:2px 10px;border-radius:999px;margin:0 6px 10px 0}
+.tag.d{color:#ffb39d;background:rgba(238,122,82,.14);border-color:rgba(238,122,82,.4)}
+.q{font:700 clamp(21px,2.8vw,28px)/1.25 Philosopher,serif;margin:0 0 18px;text-wrap:balance}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{background:rgba(20,10,36,.55);border:1.5px solid var(--line);border-radius:14px;text-align:left;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;line-height:1.35}
+.opt kbd{font:700 13px "Alegreya Sans";background:rgba(160,92,240,.3);border-radius:6px;padding:2px 7px;flex:none}
+.opt:hover:not(:disabled){border-color:var(--v2);box-shadow:0 0 14px rgba(160,92,240,.35)}
+.opt:disabled{cursor:default}
+.ok{background:rgba(79,209,139,.16)!important;border-color:var(--ok)!important;box-shadow:0 0 14px rgba(79,209,139,.35)!important}
+.no{background:rgba(255,107,122,.14)!important;border-color:var(--bad)!important}
+.fb{margin-top:16px;padding:14px 16px;border-radius:14px;background:rgba(20,10,36,.6);border:1px solid var(--line);display:none}
+.fb.show{display:block}.fb b{font-family:Philosopher,serif}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.tf{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.tf button{font:700 22px Philosopher,serif;min-height:70px;border-radius:16px}
+.tf .t{background:linear-gradient(180deg,#3fbf7c,#24804f);box-shadow:0 0 18px rgba(79,209,139,.35)}
+.tf .f{background:linear-gradient(180deg,#ff7a88,#c43c55);box-shadow:0 0 18px rgba(255,107,122,.35)}
+.stmt{min-height:120px;display:flex;align-items:center;justify-content:center;text-align:center;font:700 clamp(21px,3vw,28px)/1.3 Philosopher,serif;padding:14px;border-radius:16px;border:1.5px solid transparent;transition:background .25s}
+.timer{font:700 30px Philosopher,serif;color:var(--v2);text-shadow:0 0 12px var(--v)}
+.match{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.match .col{display:flex;flex-direction:column;gap:10px}
+.tile{background:rgba(20,10,36,.55);border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;text-align:left;line-height:1.3;font-size:16px}
+.tile.sel{border-color:var(--v2);box-shadow:0 0 14px rgba(160,92,240,.5)}
+.tile.done{background:rgba(79,209,139,.14);border-color:var(--ok);opacity:.7}
+.shake{animation:sh .35s}
+@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.flip{perspective:1000px;height:270px;background:none;padding:0;width:100%;border-radius:18px}
+.inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d}
+.flip.on .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;border:1.5px solid var(--line)}
+.front{background:radial-gradient(circle at 50% 40%,#5b2d99,#2a1748 75%);font:700 clamp(26px,4vw,38px)/1.2 Philosopher,serif;text-shadow:0 0 18px rgba(201,155,255,.6)}
+.back{background:rgba(20,10,36,.85);transform:rotateY(180deg);font-size:21px;line-height:1.4}
+.face small{font:500 14px "Alegreya Sans";color:var(--muted);margin-top:12px}
+.big{font:700 clamp(46px,8vw,72px)/1 Philosopher,serif;color:var(--v2);text-shadow:0 0 24px var(--v);margin:6px 0}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 4px}
+.miss{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.miss li{background:rgba(20,10,36,.55);border:1px solid var(--line);border-left:3px solid var(--bad);border-radius:12px;padding:10px 14px;font-size:16px}
+.miss em{color:var(--ok);font-style:normal;font-weight:700}
+footer{text-align:center;color:var(--muted);font-size:14px;padding:0 16px 30px;position:relative;z-index:1}
+@media(max-width:900px){.trio{grid-template-columns:1fr;justify-items:center;text-align:center}.sigil{max-width:360px;order:-1}.side,.side.r{text-align:center}.ladder{max-width:300px;margin-inline:auto}.panels{grid-template-columns:1fr}nav .links{display:none}nav .pillbtn{margin-left:auto}.p4,.p5,.p6{display:none}}
+@media(max-width:640px){.modes{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:20px}.mode:nth-child(3)::before{display:none}.mode svg{width:92px;height:92px}.opts{grid-template-columns:1fr}.p1{width:220px;height:220px;left:-120px;top:-110px}.p2{width:70px;height:70px;top:70px}.p3{display:none}.tile{font-size:15px;padding:8px}.recs{max-width:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="planet p1"></div><div class="planet p2"></div><div class="planet p3"></div><div class="planet p4"></div><div class="planet p5"></div><div class="planet p6"></div>
+<div class="wrap">
+<nav>
+  <div class="logo"><svg viewBox="0 0 34 34"><rect x="7" y="7" width="20" height="20" transform="rotate(45 17 17)" fill="none" stroke="#c99bff" stroke-width="2"/><rect x="12" y="12" width="10" height="10" transform="rotate(45 17 17)" fill="#a05cf0"/></svg>Myth Trials</div>
+  <div class="links"><a href="#trials">Trials</a><a href="#prepare">Prepare</a><a href="#records">Records</a></div>
+  <button class="pillbtn" id="navGo">Play</button>
+</nav>
+<section class="hero">
+  <h1>Secrets of the Myths</h1>
+  <p class="lead">A study game for Hamilton’s <i>Mythology</i>: the Flower-Myths, Cupid and Psyche, and the Eight Brief Tales of Lovers.</p>
+  <div class="trio">
+    <div class="side">
+      <h2 id="rankName">Mortal</h2>
+      <p id="rankTxt"></p>
+      <ul class="ladder" id="ladder"></ul>
+    </div>
+    <div class="sigil" id="sigil"></div>
+    <div class="side r">
+      <h2>Twelve tales,<br>four trials</h2>
+      <p>Narcissus and Echo, Hyacinthus, Adonis, Cupid and Psyche, Pyramus and Thisbe, Orpheus, Ceyx and Alcyone, Pygmalion, Baucis and Philemon, Endymion, Daphne and Arethusa.</p>
+      <button class="pillbtn go" id="heroGo" style="margin-top:0">Begin the trial</button>
+    </div>
+  </div>
+</section>
+<main id="view"></main>
+</div>
+<footer>Questions are based on Edith Hamilton, <i>Mythology</i>, from “Flower-Myths” up to “The Quest of the Golden Fleece”. Your XP is saved in this browser only.</footer>
+
+<script>
+{
+const ST={F:"Flower-Myths",P:"Cupid & Psyche",Y:"Pyramus & Thisbe",O:"Orpheus & Eurydice",C:"Ceyx & Alcyone",G:"Pygmalion",B:"Baucis & Philemon",E:"Endymion",D:"Daphne",A:"Alpheus & Arethusa"};
+
+/* [story, difficulty 1-3, question, correct, [wrong x3], explanation] */
+const Q=[
+["F",1,"Who created the narcissus flower to help Hades carry off Persephone?","Zeus",["Hera","Demeter","Aphrodite"],"Zeus made the purple-and-silver narcissus to lure Persephone so his brother could seize her."],
+["F",3,"In which vale was Persephone picking flowers when she was taken?","Enna",["Tempe","Arcadia","Delphi"],"She was gathering flowers with her companions in the vale of Enna."],
+["F",1,"What was Echo’s punishment from Hera?","She could only repeat the last words said to her",["She could never sing again","She could only speak in riddles","She was turned to stone"],"Echo had distracted Hera with chatter while Zeus’s nymphs slipped away, so Hera took away her power to speak first."],
+["F",3,"Before Hera punished her, Echo was a favourite of which goddess?","Artemis",["Aphrodite","Athena","Demeter"],"Echo was a favourite of Artemis, goddess of woods and wild creatures."],
+["F",1,"What did Narcissus fall in love with?","His own reflection in a pool",["Echo’s voice","A nymph of Artemis","A marble statue"],"Bending over a clear pool to drink, he fell in love with his own image."],
+["F",2,"Which goddess answered the prayer “May he who loves not others love himself”?","Nemesis",["Hera","Aphrodite","Artemis"],"Nemesis, whose name means righteous anger, punished Narcissus."],
+["F",2,"What did Narcissus’ ghost do while crossing the river of the dead?","Leaned over the boat to see its reflection",["Called out Echo’s name","Drank from the river Lethe","Sang a lament"],"A typically Ovidian touch, according to Hamilton."],
+["F",2,"In one version, which letters did Apollo inscribe on the hyacinth?","AI AI, meaning “Alas”",["His own initials","The word “Farewell”","Omega Omega"],"Either the boy’s name or the Greek word for “Alas”, a memorial of the god’s grief."],
+["F",2,"According to another version, who really caused Hyacinthus’ death?","Zephyr, the West Wind",["Boreas, the North Wind","Hermes","Ares"],"Zephyr also loved Hyacinthus and, jealous of Apollo, blew the discus off course."],
+["F",1,"How did Hyacinthus die?","He was struck by Apollo’s discus",["He was gored by a boar","A viper bit him","He drowned"],"They were only playing a game, and Apollo’s discus hit him on the forehead."],
+["F",1,"How did Adonis die?","He was gored by a wild boar",["He fell from a cliff","He was struck by a discus","Hades took him"],"He wounded a boar while hunting, and the beast, mad with pain, gored him."],
+["F",1,"Which flower sprang from Adonis’ blood?","The anemone (windflower)",["The hyacinth","The narcissus","The laurel"],"Every year Greek girls rejoiced when the blood-red anemone bloomed again."],
+["F",2,"How did Zeus divide Adonis’ year?","Autumn and winter with Persephone, spring and summer with Aphrodite",["Spring and summer with Persephone, autumn and winter with Aphrodite","Alternate years with each goddess","Nine months with Aphrodite, three with Persephone"],"Zeus had to judge because neither goddess would give him up."],
+["F",3,"Where did Hamilton take the story of Persephone and the narcissus from?","A Homeric Hymn",["Ovid","Apuleius","Theocritus"],"The Hymn tells it simply and objectively, unlike Ovid."],
+["F",3,"Which two poets are Hamilton’s sources for Adonis?","Theocritus and Bion",["Ovid and Virgil","Homer and Hesiod","Apuleius and Ovid"],"Third-century Alexandrian poets: tender, a little soft, always in good taste."],
+["F",3,"What dark custom may lie behind the flower myths, according to Hamilton?","Killing a villager so his blood would make barren fields fruitful",["Burning temples in spring","Exiling beautiful young men","Throwing flowers into graves"],"Later the cruel part was forgotten and the youth was said to have died by accident."],
+["P",3,"Who is the only ancient writer who tells the story of Cupid and Psyche?","Apuleius",["Ovid","Homer","Theocritus"],"A Latin writer of the 2nd century AD, which is why Latin names are used."],
+["P",1,"Why was Venus angry with Psyche?","People worshipped Psyche’s beauty and neglected Venus",["Psyche insulted her temple","Psyche stole her golden apple","Psyche refused to marry"],"Venus’ temples were neglected and her altars full of cold ashes."],
+["P",1,"What did Venus order Cupid to do to Psyche?","Make her fall in love with the vilest creature in the world",["Kill her with an arrow","Bring her to Olympus","Turn her into a bird"],"But when Cupid saw Psyche, it was as if he had shot himself with his own arrow."],
+["P",2,"What did Apollo’s oracle say Psyche would marry?","A fearful winged serpent stronger than the gods",["A sea god","A mortal king","A giant from the mountains"],"Cupid had asked Apollo for help, so the oracle sent her to the hilltop."],
+["P",1,"Which wind carried Psyche from the hilltop to the palace?","Zephyr",["Boreas","Notus","Eurus"],"Zephyr, the sweetest and mildest of winds, lifted her down to a flowery meadow."],
+["P",1,"What did the sisters tell Psyche to hide by her bed?","A lamp and a sharp knife",["A rope and a torch","A cup of poison","A mirror and a sword"],"She was to light the lamp and kill the ‘serpent’ while he slept."],
+["P",1,"What woke Cupid?","A drop of hot oil from the lamp",["The sisters’ footsteps","The knife falling","The dawn"],"As Psyche gazed at him, hot oil fell on his shoulder."],
+["P",1,"What did Cupid say as he left Psyche?","“Love cannot live where there is no trust.”",["“You will never see me again.”","“My mother was right about you.”","“Find me among the gods.”"],"He told her who he was, said farewell, and flew away."],
+["P",2,"Who helped Psyche sort the huge heap of seeds?","Ants",["Bees","Doves","Mice"],"The little ants took pity on her and separated every seed by kind."],
+["P",2,"Who told Psyche how to gather the golden wool?","A green reed",["A river god","A tower","An owl"],"She should wait until the fierce sheep rested in the evening and take wool from the bushes."],
+["P",2,"Who filled the flask with water from the Styx?","An eagle",["Mercury","A swan","Cupid"],"The rocks were too steep and slimy; only a winged creature could reach the falls."],
+["P",2,"Who told Psyche the way to Proserpine’s palace?","A tower",["A reed","Mercury","An old woman"],"It told her about the hole in the earth, Charon’s penny and Cerberus’ cake."],
+["P",3,"What did Psyche give Cerberus so he would let her pass?","A cake",["A bone","A song","A coin"],"The coin was for Charon; the cake made the three-headed dog friendly."],
+["P",2,"What happened when Psyche opened Proserpine’s box?","It seemed empty, then a deathlike sleep overcame her",["Moths flew out","Her beauty disappeared","Venus appeared"],"Curiosity and vanity: she wanted to look lovelier for Cupid."],
+["P",2,"How did Psyche become immortal?","Jupiter gave her ambrosia",["Venus kissed her","She bathed in the Styx","Cupid shot her with a golden arrow"],"Mercury brought her to Olympus and Jupiter made her immortal."],
+["P",3,"Why could Venus accept the marriage in the end?","With Psyche in heaven, she would no longer draw men away from Venus’ worship",["Jupiter threatened her","Cupid promised to leave","Psyche became her servant forever"],"A daughter-in-law in heaven was no rival on earth."],
+["P",2,"What do Cupid and Psyche stand for?","Love and the Soul",["Beauty and Envy","Spring and Death","Day and Night"],"Psyche is the Greek word for soul."],
+["Y",1,"In which city did Pyramus and Thisbe live?","Babylon",["Athens","Thebes","Troy"],"Their houses stood side by side."],
+["Y",1,"How did Pyramus and Thisbe talk to each other?","Through a chink in the wall between their houses",["Through letters","Through a servant","In a temple"],"The hateful wall became their way of reaching each other."],
+["Y",2,"Where did they agree to meet?","Under a mulberry tree by the tomb of Ninus",["At the city gate","Beside the river Euphrates","In the temple of Venus"],"The tree was full of snow-white berries."],
+["Y",1,"What frightened Thisbe away?","A lioness with bloody jaws",["A wild boar","A storm","Her father"],"She fled and dropped her cloak, which the lioness tore."],
+["Y",1,"Why did Pyramus kill himself?","He found Thisbe’s torn, bloody cloak and thought she was dead",["Her father forbade the marriage","She did not come","A god cursed him"],"“It is I who killed you,” he said."],
+["Y",1,"What changed because of the lovers’ death?","Mulberries turned from white to dark red",["Roses became red","The river turned to blood","The wall fell down"],"The red fruit is the lovers’ everlasting memorial."],
+["Y",3,"What happened to the lovers’ ashes?","They were placed in one urn",["They were scattered over the river","They were buried under the tree","They became two stars"],"Not even death could part them."],
+["O",1,"Who was Orpheus’ mother?","One of the Muses",["Athena","A nymph of Artemis","A Thracian queen"],"His father was a Thracian prince."],
+["O",2,"Which land was Orpheus from, the most musical in Greece?","Thrace",["Arcadia","Crete","Boeotia"],"Thrace fostered his gift of music."],
+["O",2,"On which expedition did Orpheus sail?","Jason’s voyage on the Argo",["The Trojan War","Odysseus’ return home","Theseus’ trip to Crete"],"His music cheered the rowers and calmed quarrels."],
+["O",2,"How did Orpheus save the Argonauts from the Sirens?","He played a louder, clearer tune that drowned their song",["He blocked their ears with wax","He sang them to sleep","He prayed to Apollo"],"Without him they would have left their bones on the Sirens’ island."],
+["O",1,"How did Eurydice die?","A viper bit her just after the wedding",["She drowned","Maenads killed her","She fell from a cliff"],"She was walking in a meadow with her bridesmaids."],
+["O",1,"What was the condition for Eurydice’s return?","Orpheus must not look back until they reached the upper world",["He must never play again","He must stay silent","She must walk ahead of him"],"He turned just as he stepped into daylight, while she was still in the cave."],
+["O",2,"Who wept for the first time when Orpheus sang in Hades?","The Furies",["Cerberus","Charon","Persephone’s maidens"],"Ixion’s wheel stopped and Sisyphus rested on his stone too."],
+["O",2,"Who killed Orpheus?","A band of frenzied Maenads",["The Furies","Pluto","Thracian soldiers"],"They tore him limb from limb and threw his head into the Hebrus."],
+["O",3,"Where did Orpheus’ head wash ashore?","Lesbos",["Crete","Delos","Sicily"],"The Muses buried it in a sanctuary there."],
+["O",3,"Where are the nightingales said to sing most sweetly?","At Orpheus’ tomb at the foot of Mount Olympus",["On Lesbos","By the river Hebrus","At Delphi"],"The Muses buried his limbs there."],
+["O",3,"Which god invented the flute but never played it?","Athena",["Hermes","Pan","Apollo"],"Hermes made the lyre and Pan the reed pipe."],
+["O",3,"Who is the only source for Orpheus with the Argonauts?","Apollonius of Rhodes",["Ovid","Virgil","Apuleius"],"The rest of the story is best told by Virgil and Ovid."],
+["C",2,"Who was Alcyone’s father?","Aeolus, King of the Winds",["Poseidon","Lucifer","Zeus"],"That is why she knew the power of the winds at sea."],
+["C",3,"Who was Ceyx’s father?","Lucifer, the morning star",["Aeolus","Apollo","Oceanus"],"His father’s bright gladness was in his face."],
+["C",1,"Why did Ceyx go on his sea journey?","To consult an oracle",["To fight a war","To find a new kingdom","To visit his father"],"Various matters had disturbed him."],
+["C",2,"Which goddess did Alcyone pray to most?","Juno",["Venus","Minerva","Diana"],"Juno was moved by prayers for a man already dead."],
+["C",2,"Whom did Juno send to the house of Sleep?","Iris",["Mercury","Aurora","Hebe"],"Iris trailed her rainbow cloak across the sky."],
+["C",2,"Who appeared to Alcyone in the shape of drowned Ceyx?","Morpheus",["Somnus","Iris","Hermes"],"Somnus’ son could take the form of any human being."],
+["C",3,"Which river flows by the house of Sleep?","Lethe, the river of forgetfulness",["Styx","Acheron","Hebrus"],"Its murmuring water invites sleep; poppies bloom at the door."],
+["C",1,"What happened when Alcyone leaped into the sea?","She was changed into a bird, and so was Ceyx",["She drowned beside him","Neptune carried her to his palace","She became a sea nymph"],"They are always seen together."],
+["C",1,"What are “Halcyon days”?","Seven calm days each winter while Alcyone broods on her nest",["The days of a wedding feast","The first days of spring","Days when no ship may sail"],"They are named after Alcyone."],
+["G",1,"Where did Pygmalion live?","Cyprus",["Crete","Rhodes","Athens"],"Cyprus was the island that first received Venus."],
+["G",1,"What was Pygmalion’s attitude toward women before the statue?","He was a woman-hater who would never marry",["He loved many women","He was engaged to a princess","He worshipped Diana"],"Yet he made a statue of a woman."],
+["G",2,"What sign did Venus give that she favoured his prayer?","The altar flame leaped up three times",["A dove landed on him","Thunder sounded","The statue wept"],"He had asked only for a maiden like his statue."],
+["G",2,"What name did Pygmalion give the living statue?","Galatea",["Pandora","Psyche","Daphne"],"Venus herself came to their wedding."],
+["G",3,"What was the name of Pygmalion’s son?","Paphos",["Adonis","Cyprus","Hymen"],"He gave his name to Venus’ favourite city."],
+["G",3,"What “supreme achievement of art” did Pygmalion reach, according to Hamilton?","The art of concealing art",["The art of moving stone","The art of speaking marble","The art of eternal colour"],"The statue looked like living flesh, not ivory."],
+["B",1,"Which gods visited Baucis and Philemon in disguise?","Jupiter and Mercury",["Apollo and Diana","Neptune and Pluto","Mars and Venus"],"They were testing the hospitality of the people of Phrygia."],
+["B",2,"In which region did Baucis and Philemon live?","Phrygia",["Thessaly","Thrace","Boeotia"],"All their neighbours slammed their doors on the travellers."],
+["B",1,"What miracle did the old couple notice at dinner?","The wine bowl never emptied",["The bread multiplied","The fire never went out","The cabbage turned to gold"],"They were terrified and prayed."],
+["B",2,"Which animal did they try, and fail, to catch for their guests?","A goose",["A hen","A goat","A rabbit"],"The gods watched, greatly amused."],
+["B",2,"What happened to the rest of the countryside?","It was flooded",["It burned","It turned to desert","An earthquake destroyed it"],"Only their hut was left, and it became a temple."],
+["B",3,"What did their hut become?","A marble temple with a golden roof",["A palace of silver","A sacred grove","A bronze tower"],"They served as its priests."],
+["B",1,"What was Baucis and Philemon’s wish?","To serve as priests and die together",["To be young again","To be rich","To live on Olympus"],"Neither wanted to live alone."],
+["B",1,"What did Baucis and Philemon become?","An oak and a linden from one trunk",["Two doves","Two stars","Two laurel trees"],"People hung wreaths on their branches."],
+["E",1,"Who loved Endymion?","The Moon",["Aphrodite","Artemis’ nymph Echo","The Dawn"],"She visits him every night."],
+["E",2,"What is Endymion’s fate?","He sleeps forever, immortal but never awake",["He becomes a constellation","He becomes a river","He dies young and becomes a flower"],"The Moon is said to have lulled him to sleep herself."],
+["E",2,"What do most poets say Endymion was?","A shepherd",["A king","A hunter","A sculptor"],"Some say king, some hunter, but most say shepherd."],
+["E",3,"Whose version of Endymion does Hamilton use?","Theocritus",["Ovid","Apuleius","Virgil"],"Told simply and with restraint, in the true Greek manner."],
+["D",1,"Who chased Daphne?","Apollo",["Zeus","Pan","Alpheus"],"She is said to have been his first love."],
+["D",1,"What was Daphne changed into?","A laurel tree",["A spring","An oak","A bird"],"Her feet took root and bark closed around her."],
+["D",2,"Who was Daphne’s father?","Peneus, a river god",["Aeolus","Alpheus","Oceanus"],"He complained that she refused all her suitors."],
+["D",2,"Which goddess did Daphne want to be like?","Diana",["Venus","Minerva","Juno"],"She wanted freedom in the woods, like the huntress."],
+["D",2,"How did Apollo introduce himself while chasing her?","As the Lord of Delphi",["As the God of War","As the son of Neptune","As a shepherd"],"“I am no rude rustic or shepherd.”"],
+["D",3,"What did Apollo think when he first saw Daphne’s wild hair?","What would she look like properly dressed with her hair arranged?",["She must be a goddess","She looks like his sister","She must be a Maenad"],"Hamilton says only a Roman like Ovid would think of that."],
+["D",2,"What honour did Apollo give the laurel?","Its leaves would crown his victors",["It would never lose its leaves in Hades","It would grow at every altar","It would be used for his lyre"],"The tree seemed to nod in happy consent."],
+["A",1,"What was Arethusa changed into?","A spring",["A laurel","A bird","A river"],"Artemis changed her to help her escape."],
+["A",2,"Who pursued Arethusa?","Alpheus, a river god",["Apollo","Pan","Peneus"],"She was bathing in his river when she felt something stir."],
+["A",2,"Where does the spring of Arethusa rise?","On Ortygia, part of Syracuse in Sicily",["On Delos","On Crete","At Delphi"],"It flows under the sea from Greece to Sicily."],
+["A",2,"Who transformed Arethusa?","Artemis",["Athena","Hera","Aphrodite"],"Arethusa was a huntress and follower of Artemis."],
+["A",3,"What is said about a wooden cup thrown into the Alpheus in Greece?","It reappears in Arethusa’s well in Sicily",["It sinks to Hades","It turns into a flower","It floats to Olympus"],"Greek flowers are also said to come up from the bottom of the spring."]
+];
+
+/* [story, statement, true?, note] */
+const TF=[
+["F","Zeus created the narcissus to help Hades.",true,"He used it to lure Persephone."],
+["F","Echo could only repeat the first words said to her.",false,"She repeated the last words."],
+["F","Narcissus was punished by Nemesis.",true,"The goddess of righteous anger answered a rejected lover’s prayer."],
+["F","Hyacinthus was killed by Apollo’s arrow.",false,"It was a discus."],
+["F","In another version, Zephyr was jealous of Apollo.",true,"He blew the discus at Hyacinthus."],
+["F","Adonis was killed by a lion.",false,"A wild boar gored him."],
+["F","Adonis spent spring and summer with Aphrodite.",true,"Autumn and winter with Persephone."],
+["F","The anemone grew from Adonis’ blood.",true,"The blood-red windflower."],
+["P","Psyche was the eldest of three daughters.",false,"She was the youngest."],
+["P","Cupid fell in love with Psyche as soon as he saw her.",true,"As if he had shot his own heart."],
+["P","Psyche saw her husband every night.",false,"She never saw him until the lamp."],
+["P","The sisters were jealous of Psyche’s palace.",true,"Envy made them plot her ruin."],
+["P","Ants helped Psyche sort the seeds.",true,"They took pity on her."],
+["P","An eagle fetched the water of the Styx.",true,"Only a winged creature could reach it."],
+["P","Psyche never opened Proserpine’s box.",false,"She opened it and fell into a deathlike sleep."],
+["P","Mercury made Psyche immortal with ambrosia.",false,"Jupiter gave her ambrosia; Mercury only brought her."],
+["Y","Pyramus and Thisbe lived in Athens.",false,"They lived in Babylon."],
+["Y","They met by the tomb of Ninus.",true,"Under a white mulberry tree."],
+["Y","Mulberries were once white.",true,"The lovers’ blood turned them dark red."],
+["Y","Thisbe was killed by the lioness.",false,"She escaped; she later killed herself with Pyramus’ sword."],
+["O","Orpheus was the son of a Muse.",true,"His father was a Thracian prince."],
+["O","Orpheus sailed on the Argo.",true,"He saved the heroes from the Sirens."],
+["O","Eurydice was bitten by a viper.",true,"Right after the wedding."],
+["O","Orpheus brought Eurydice back to the upper world.",false,"He looked back too soon."],
+["O","Orpheus was killed by Maenads.",true,"They threw his head into the Hebrus."],
+["C","Ceyx’s father was Aeolus.",false,"Aeolus was Alcyone’s father; Ceyx’s was Lucifer."],
+["C","Iris carried Juno’s message to Somnus.",true,"Then she hurried away before she fell asleep."],
+["C","Morpheus can take any human form.",true,"He appeared as drowned Ceyx."],
+["C","Ceyx and Alcyone became trees.",false,"They became birds."],
+["C","Halcyon days are calm days at sea in winter.",true,"Alcyone broods on her floating nest."],
+["G","Pygmalion was a sculptor from Cyprus.",true,"He made an ivory statue."],
+["G","Pygmalion asked Venus outright to bring his statue to life.",false,"He only dared to ask for a maiden like it."],
+["G","Pygmalion named the statue Galatea.",true,"Their son was Paphos."],
+["B","Jupiter travelled with Apollo to Phrygia.",false,"His companion was Mercury."],
+["B","Baucis and Philemon were rich.",false,"They were poor but contented."],
+["B","The wine bowl never emptied.",true,"That is how they realised who their guests were."],
+["B","The couple became an oak and a linden.",true,"Growing from a single trunk."],
+["E","The Moon visits sleeping Endymion every night.",true,"He never wakes to see her."],
+["D","Daphne was Apollo’s first love.",true,"So the story says."],
+["D","Daphne’s father was the river god Alpheus.",false,"Her father was Peneus."],
+["D","Daphne became a laurel.",true,"Apollo made it his tree."],
+["A","Arethusa was a follower of Artemis.",true,"A huntress who avoided men."],
+["A","The spring of Arethusa is in Crete.",false,"It is on Ortygia, in Syracuse, Sicily."],
+["A","Alpheus followed Arethusa under the sea.",true,"His water mingles with hers."]
+];
+
+/* [story, front, back] - used for flashcards and matching */
+const CARDS=[
+["F","Persephone","Seized by Hades as she reached for a narcissus"],
+["F","Echo","Can only repeat the last words she hears"],
+["F","Narcissus","Fell in love with his own reflection"],
+["F","Nemesis","Goddess of righteous anger who punished Narcissus"],
+["F","Hyacinthus","Killed by Apollo’s discus; flower marked AI AI"],
+["F","Zephyr","West Wind; in one version caused Hyacinthus’ death"],
+["F","Adonis","Gored by a boar; the anemone grew from his blood"],
+["P","Psyche","Mortal whose beauty angered Venus; made immortal"],
+["P","Cupid","God of Love who said love needs trust"],
+["P","Venus’ four tasks","Seeds, golden wool, Styx water, Proserpine’s box"],
+["P","Apuleius","Only source for Cupid and Psyche"],
+["Y","Pyramus","Killed himself, thinking Thisbe was dead"],
+["Y","Thisbe","Fled a lioness and dropped her cloak"],
+["Y","Mulberry","Its berries turned from white to red"],
+["O","Orpheus","Musician who looked back too soon"],
+["O","Eurydice","Died of a viper bite; lost a second time"],
+["O","Maenads","Tore Orpheus apart in Thrace"],
+["C","Ceyx","King drowned in a storm on the way to an oracle"],
+["C","Alcyone","Daughter of Aeolus; became a bird"],
+["C","Somnus","God of Sleep, near the river Lethe"],
+["C","Morpheus","Takes any human shape in dreams"],
+["C","Halcyon days","Seven calm winter days at sea"],
+["G","Pygmalion","Cypriot sculptor who loved his statue"],
+["G","Galatea","The statue brought to life by Venus"],
+["B","Baucis and Philemon","Poor couple who became an oak and a linden"],
+["B","Jupiter and Mercury","Gods disguised as poor travellers in Phrygia"],
+["E","Endymion","Beautiful youth in eternal sleep, loved by the Moon"],
+["D","Daphne","Fled Apollo and became a laurel"],
+["D","Peneus","River god, father of Daphne"],
+["A","Arethusa","Huntress turned into a spring in Sicily"],
+["A","Alpheus","River god who followed Arethusa under the sea"]
+];
+
+const RANKS=[[0,"Mortal"],[150,"Hero"],[450,"Demigod"],[900,"Titan"],[1500,"Olympian"]];
+
+const defs=`<defs><radialGradient id="gG" cx="35%" cy="35%"><stop offset="0" stop-color="#9ff0be"/><stop offset=".6" stop-color="#2f9a62"/><stop offset="1" stop-color="#14512f"/></radialGradient><pattern id="sc" width="12" height="10" patternUnits="userSpaceOnUse"><path d="M0 10a6 6 0 0 1 12 0M-6 5a6 6 0 0 1 12 0M6 5a6 6 0 0 1 12 0" fill="none" stroke="#0e3e23" stroke-width="1.2" opacity=".6"/></pattern><radialGradient id="gO" cx="35%" cy="35%"><stop offset="0" stop-color="#ffb08a"/><stop offset=".6" stop-color="#e2683e"/><stop offset="1" stop-color="#8a3018"/></radialGradient><radialGradient id="gM" cx="35%" cy="35%"><stop offset="0" stop-color="#fbf2f7"/><stop offset=".7" stop-color="#cdb7c9"/><stop offset="1" stop-color="#7c6378"/></radialGradient><radialGradient id="gP" cx="50%" cy="50%"><stop offset="0" stop-color="#4a2380"/><stop offset="1" stop-color="#22103d"/></radialGradient></defs>`;
+const halo=`<circle cx="60" cy="60" r="56" fill="#2a1748" stroke="rgba(201,155,255,.35)" stroke-width="2"/>`;
+const MODES=[
+ ["quiz","Trial of Wisdom","10 questions, three lives, streak bonus",`<svg viewBox="0 0 120 120">${defs}${halo}<circle cx="60" cy="60" r="42" fill="url(#gG)"/><circle cx="60" cy="60" r="42" fill="url(#sc)"/><circle cx="60" cy="60" r="42" fill="none" stroke="#9ff0be" stroke-opacity=".4" stroke-width="2"/></svg>`],
+ ["match","Pair the Fates","Match six names to what befell them",`<svg viewBox="0 0 120 120">${defs}${halo}<circle cx="60" cy="60" r="42" fill="url(#gP)"/><circle cx="47" cy="60" r="20" fill="none" stroke="#c99bff" stroke-width="3"/><circle cx="73" cy="60" r="20" fill="none" stroke="#c99bff" stroke-width="3"/><path d="M60 26v68M30 60h60" stroke="#c99bff" stroke-opacity=".45" stroke-width="1.5"/><circle cx="60" cy="60" r="42" fill="none" stroke="#c99bff" stroke-width="2.5"/></svg>`],
+ ["cards","Scrolls of Memory","Flashcards to flip, keep or review",`<svg viewBox="0 0 120 120">${defs}${halo}<circle cx="60" cy="60" r="42" fill="url(#gO)"/><g fill="#8a3018" opacity=".45"><circle cx="45" cy="50" r="6"/><circle cx="72" cy="72" r="9"/><circle cx="74" cy="44" r="4"/><circle cx="50" cy="78" r="3"/></g></svg>`],
+ ["tf","Oracle’s Blitz","60 seconds of true or false",`<svg viewBox="0 0 120 120">${defs}${halo}<circle cx="60" cy="60" r="42" fill="url(#gM)"/><circle cx="60" cy="60" r="34" fill="none" stroke="#7c6378" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M38 60q22-22 44 0q-22 22-44 0z" fill="none" stroke="#5a4057" stroke-width="2.5"/><circle cx="60" cy="60" r="7" fill="#5a4057"/></svg>`]
+];
+const DIFFS=[["easy","Easy"],["medium","Medium"],["hard","Hard"],["mixed","Mixed"]];
+
+let save={xp:0,best:{}};
+try{save=Object.assign(save,JSON.parse(localStorage.getItem("mythTrials")||"{}"))}catch(e){}
+const persist=()=>{try{localStorage.setItem("mythTrials",JSON.stringify(save))}catch(e){}};
+let cfg={mode:"quiz",diff:"mixed",story:"all"};
+{const c=save.cfg||{};if(MODES.some(m=>m[0]===c.mode))cfg.mode=c.mode;if(DIFFS.some(d=>d[0]===c.diff))cfg.diff=c.diff;if(c.story==="all"||ST[c.story])cfg.story=c.story}
+const setCfg=(k,v)=>{cfg[k]=v;save.cfg=cfg;persist()};
+const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+const view=document.getElementById("view");
+let timer=null,keyH=null;
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const storyOK=r=>cfg.story==="all"||r[0]===cfg.story;
+const diffOK=r=>cfg.diff==="mixed"||(cfg.diff==="easy"?r[1]===1:cfg.diff==="medium"?r[1]===2:r[1]===3);
+const rankOf=xp=>{let r=RANKS[0],n=RANKS[1];for(let i=0;i<RANKS.length;i++){if(xp>=RANKS[i][0]){r=RANKS[i];n=RANKS[i+1]||null}}return{r,n}};
+const stop=()=>{clearInterval(timer);timer=null;if(keyH){document.removeEventListener("keydown",keyH);keyH=null}};
+const onKey=f=>{keyH=f;document.addEventListener("keydown",f)};
+const MN=Object.fromEntries(MODES.map(m=>[m[0],m[1]]));
+
+function sigil(){
+  const {r,n}=rankOf(save.xp),pct=n?(save.xp-r[0])/(n[0]-r[0]):1,C=2*Math.PI*78;
+  const dots=Array.from({length:8},(_,i)=>{const a=i*Math.PI/4-Math.PI/2;return `<circle cx="${(220+178*Math.cos(a)).toFixed(1)}" cy="${(220+178*Math.sin(a)).toFixed(1)}" r="6" fill="#140a24" stroke="#f3ecff" stroke-width="2"/>`}).join("");
+  const star=(R,k)=>Array.from({length:k*2},(_,i)=>{const a=i*Math.PI/k-Math.PI/2,rr=i%2?R*.62:R;return `${(220+rr*Math.cos(a)).toFixed(1)},${(220+rr*Math.sin(a)).toFixed(1)}`}).join(" ");
+  const swirls=Array.from({length:6},(_,i)=>`<path transform="rotate(${i*60} 220 220)" d="M220 108c34 6 52 30 44 56c-6 18-28 22-34 8c-4-10 6-18 14-12" fill="none" stroke="#a05cf0" stroke-width="5" stroke-linecap="round" opacity=".55"/>`).join("");
+  document.getElementById("sigil").innerHTML=`<svg viewBox="0 0 440 440" aria-label="Rank sigil: ${save.xp} XP, ${r[1]}">
+   <defs><path id="tp" d="M220 220m-150 0a150 150 0 1 1 300 0a150 150 0 1 1 -300 0"/><radialGradient id="glow"><stop offset=".55" stop-color="#a05cf0" stop-opacity=".35"/><stop offset="1" stop-color="#a05cf0" stop-opacity="0"/></radialGradient></defs>
+   <circle cx="220" cy="220" r="215" fill="url(#glow)"/>
+   <circle cx="220" cy="220" r="178" fill="none" stroke="#c99bff" stroke-opacity=".5" stroke-width="1.5"/>
+   <g class="spin">${dots}<circle cx="220" cy="220" r="164" fill="#1d1033" stroke="#c99bff" stroke-width="2"/>
+   <text font-family="Philosopher" font-size="15" letter-spacing="5" fill="#c99bff"><textPath href="#tp">ΝΑΡΚΙΣΣΟΣ · ΕΡΩΣ · ΨΥΧΗ · ΟΡΦΕΥΣ · ΑΛΚΥΟΝΗ · ΔΑΦΝΗ · ΑΡΕΘΟΥΣΑ · ΑΔΩΝΙΣ ·</textPath></text>
+   <circle cx="220" cy="220" r="136" fill="none" stroke="#c99bff" stroke-opacity=".6" stroke-width="1.5"/>${swirls}</g>
+   <polygon points="${star(132,8)}" fill="none" stroke="#e7d4ff" stroke-width="2.5" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px #a05cf0)"/>
+   <circle cx="220" cy="220" r="86" fill="#140a24" stroke="#3a2163" stroke-width="10"/>
+   <circle cx="220" cy="220" r="78" fill="none" stroke="rgba(201,155,255,.15)" stroke-width="8"/>
+   <circle cx="220" cy="220" r="78" fill="none" stroke="#c99bff" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(C*pct).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 220 220)" style="filter:drop-shadow(0 0 6px #a05cf0)"/>
+   <text x="220" y="222" text-anchor="middle" font-family="Philosopher" font-weight="700" font-size="46" fill="#f3ecff">${save.xp}</text>
+   <text x="220" y="250" text-anchor="middle" font-family="Alegreya Sans" font-size="16" letter-spacing="2" fill="#bba9da">XP</text></svg>`;
+  document.getElementById("rankName").textContent=r[1];
+  document.getElementById("rankTxt").textContent=n?`${n[0]-save.xp} XP until you rise to ${n[1]}. Every right answer feeds the sigil.`:"You have reached the summit of Olympus.";
+  document.getElementById("ladder").innerHTML=RANKS.map(x=>`<li class="${x===r?"on":""}"><span>${x[1]}</span><span>${x[0]} XP</span></li>`).join("");
+}
+function addXP(x){save.xp+=Math.max(0,Math.round(x));persist();sigil()}
+const start=()=>({quiz,match,cards,tf})[cfg.mode]();
+
+function setup(focusSel){
+  stop();
+  const cq=Q.filter(storyOK).filter(diffOK).length;
+  const mount=`<svg class="deco mount" viewBox="0 0 400 120" preserveAspectRatio="none"><path d="M0 120L70 30l40 50 50-70 70 110z" fill="#4a2a7a"/><path d="M90 120l80-90 40 45 40-35 70 80z" fill="#3a2163"/><path d="M160 10l-12 14h24z" fill="#c99bff" opacity=".5"/></svg>`;
+  const swirl=`<svg class="deco swirl" viewBox="0 0 260 260"><g fill="none" stroke="#a05cf0" stroke-width="10" stroke-linecap="round"><path d="M250 250c-40-20-60-70-30-100c25-25 60-5 50 20c-7 16-28 12-26-2"/><path d="M200 260c-10-50-60-80-100-60c-30 15-25 55 5 55c18 0 22-20 8-24"/><path d="M260 170c-30-40-30-90 10-110"/><path d="M140 260c0-30-30-40-45-25"/></g></svg>`;
+  view.innerHTML=`<section class="modes" id="trials">${MODES.map(m=>`<button class="mode" data-mode="${m[0]}" aria-pressed="${cfg.mode===m[0]}">${m[3]}<strong>${m[1]}</strong><span>${m[2]}</span>${save.best[m[0]]?`<span class="best">Best ${save.best[m[0]]}</span>`:""}</button>`).join("")}</section>
+  <section class="panels">
+   <div class="panel" id="prepare">${mount}
+    <h2>Prepare your trial</h2>
+    <p class="note" style="margin:0">Chosen trial: <b style="color:var(--ink)">${MN[cfg.mode]}</b></p>
+    <h3>Difficulty</h3>
+    <div class="seg">${DIFFS.map(d=>`<button data-diff="${d[0]}" aria-pressed="${cfg.diff===d[0]}">${d[1]}</button>`).join("")}</div>
+    <p class="note">${cfg.mode==="quiz"?`${cq} questions match.${cq<10?" Others from the same story will fill the round.":""} Harder questions give more XP.`:"Difficulty applies to the Trial of Wisdom."}</p>
+    <h3>Stories</h3>
+    <div class="chips"><button class="chip" data-story="all" aria-pressed="${cfg.story==="all"}">All stories</button>${Object.entries(ST).map(([k,v])=>`<button class="chip" data-story="${k}" aria-pressed="${cfg.story===k}">${v}</button>`).join("")}</div>
+    <button class="pillbtn go" id="go">Begin the trial</button>
+   </div>
+   <div class="panel" id="records">${swirl}
+    <h2>Hall of records</h2>
+    <p class="note" style="margin:0">Your best score in each trial.</p>
+    <ul class="recs">${MODES.map(m=>`<li><span>${m[1]}</span><b>${save.best[m[0]]||"—"}</b></li>`).join("")}<li><span>Total XP</span><b>${save.xp}</b></li></ul>
+    <button class="ghost" id="reset" style="margin-top:22px;font-size:14px;min-height:36px;padding:4px 16px">Reset progress</button>
+   </div>
+  </section>`;
+  view.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{setCfg("mode",b.dataset.mode);setup(`[data-mode="${b.dataset.mode}"]`);document.getElementById("trials").scrollIntoView({block:"nearest"})});
+  view.querySelectorAll("[data-diff]").forEach(b=>b.onclick=()=>{setCfg("diff",b.dataset.diff);setup(`[data-diff="${b.dataset.diff}"]`)});
+  view.querySelectorAll("[data-story]").forEach(b=>b.onclick=()=>{setCfg("story",b.dataset.story);setup(`[data-story="${b.dataset.story}"]`)});
+  document.getElementById("go").onclick=start;
+  document.getElementById("reset").onclick=()=>{if(!confirm("Reset all XP and best scores? This cannot be undone."))return;save.xp=0;save.best={};persist();sigil();setup("#reset")};
+  if(typeof focusSel==="string")view.querySelector(focusSel)?.focus({preventScroll:true});
+}
+/* nav links and logo work from any screen */
+const goSection=id=>{if(!document.getElementById(id))setup();document.getElementById(id).scrollIntoView({behavior:"smooth",block:"start"})};
+document.querySelectorAll('nav .links a').forEach(a=>a.onclick=e=>{e.preventDefault();goSection(a.getAttribute("href").slice(1))});
+{const lg=document.querySelector(".logo");lg.style.cursor="pointer";lg.title="Back to trials";lg.onclick=()=>{setup();window.scrollTo({top:0,behavior:"smooth"})}}
+const board=()=>{view.innerHTML='<div class="panel play" id="pp"></div>';const p=document.getElementById("pp");p.scrollIntoView({behavior:"smooth",block:"start"});return p};
+const tagOf=k=>`<span class="tag">${ST[k]}</span>`;
+function best(mode,score){if(!save.best[mode]||score>save.best[mode]){save.best[mode]=score;persist();return true}return false}
+function results(title,big,stats,missHtml,mode,score,xp,retry,noBest){
+  stop();addXP(xp);const nb=!noBest&&best(mode,score);const V=board();
+  V.innerHTML=`<h2>${title}</h2><div class="big">${big}</div>
+  <div class="stats">${stats.map(s=>`<span class="pill">${s}</span>`).join("")}${xp>0?`<span class="pill">+${Math.round(xp)} XP</span>`:""}${nb?'<span class="pill" style="background:var(--v);border-color:var(--v2)">New best!</span>':""}</div>
+  ${missHtml?`<h3>Review your mistakes</h3><ul class="miss">${missHtml}</ul>`:'<p>No mistakes. The gods approve.</p>'}
+  <div class="row"><button class="pillbtn go" id="again" style="margin-top:8px">Play again</button>${typeof retry==="function"?'<button class="ghost" id="retry" style="margin-top:8px">Retry mistakes (R)</button>':""}<button class="ghost" id="menu" style="margin-top:8px">Back to trials (Esc)</button></div>`;
+  const again=document.getElementById("again");
+  again.onclick=()=>({quiz,match,cards,tf})[mode]();
+  again.focus({preventScroll:true});
+  document.getElementById("menu").onclick=()=>setup();
+  if(typeof retry==="function")document.getElementById("retry").onclick=retry;
+  onKey(e=>{if(e.key==="Escape")setup();else if(e.key.toLowerCase()==="r"&&typeof retry==="function")retry()});
+}
+/* Esc quits any running trial */
+const escQuit=e=>{if(e.key==="Escape"){setup();return true}return false};
+/* timers skip ticks while the tab is hidden */
+const tick=(f,ms)=>setInterval(()=>{if(!document.hidden)f()},ms);
+
+function quiz(only){
+  stop();const V=board();const isRetry=Array.isArray(only);
+  let p;
+  if(isRetry)p=shuffle(only);
+  else{
+    p=shuffle(Q.filter(storyOK).filter(diffOK));
+    if(p.length<10)p=p.concat(shuffle(Q.filter(storyOK).filter(r=>!p.includes(r))));
+    if(p.length<10)p=p.concat(shuffle(Q.filter(r=>!p.includes(r))));
+  }
+  const qs=p.slice(0,10).map(r=>({r,opts:shuffle([r[3],...r[4]])}));
+  let i=0,lives=isRetry?Math.max(3,qs.length):cfg.diff==="easy"?4:3,maxL=lives,score=0,streak=0,bestS=0,right=0,miss=[],missedQ=[];
+  const draw=()=>{
+    const {r,opts}=qs[i];let done=false;
+    V.innerHTML=`<div class="hud"><div class="l"><span class="hearts" aria-label="${lives} lives">${"♥".repeat(lives)}<span style="opacity:.2">${"♥".repeat(maxL-lives)}</span></span><span class="pill">Question ${i+1}/${qs.length}</span></div><div class="l"><span class="pill">Streak ${streak}${streak>=2?` · x${Math.min(3,1+Math.floor(streak/2)*.5)}`:""}</span><span class="pill">Score ${score}</span><button class="ghost" id="qx" style="min-height:36px;padding:4px 14px">Quit</button></div></div>
+    <div class="bar"><i style="width:${i/qs.length*100}%"></i></div>
+    ${tagOf(r[0])}<span class="tag d">${["","Easy","Medium","Hard"][r[1]]}</span>
+    <p class="q">${r[2]}</p>
+    <div class="opts">${opts.map((o,k)=>`<button class="opt" data-k="${k}"><kbd>${k+1}</kbd><span>${o}</span></button>`).join("")}</div>
+    <div class="fb" id="fb"></div>
+    <p class="note" style="text-align:center;margin-top:14px">Keys: 1–4 to answer, Enter for next, Esc to quit.</p>`;
+    document.getElementById("qx").onclick=()=>setup();
+    const btns=[...V.querySelectorAll(".opt")];
+    const pick=k=>{
+      if(done)return;done=true;
+      const ok=opts[k]===r[3];
+      btns.forEach((b,j)=>{b.disabled=true;if(opts[j]===r[3])b.classList.add("ok")});
+      if(ok){streak++;bestS=Math.max(bestS,streak);right++;score+=Math.round(10*r[1]*Math.min(3,1+Math.floor((streak-1)/2)*.5))}
+      else{btns[k].classList.add("no","shake");lives--;streak=0;missedQ.push(r);miss.push(`<b>${r[2]}</b><br>Your answer: ${opts[k]}<br><em>${r[3]}</em> · ${r[5]}`)}
+      const last=lives<=0||i===qs.length-1;
+      const fb=document.getElementById("fb");fb.classList.add("show");
+      fb.innerHTML=`<b>${ok?"Correct!":"Not quite."}</b> ${r[5]}<div class="row"><button class="pillbtn" id="nx">${last?"See results":"Next question"}</button>${!ok&&lives<=0?'<span>No lives left.</span>':""}</div>`;
+      const nx=document.getElementById("nx");nx.focus({preventScroll:true});
+      nx.onclick=()=>{if(last)finish();else{i++;draw()}};
+    };
+    btns.forEach((b,k)=>b.onclick=()=>pick(k));
+  };
+  const finish=()=>results(isRetry?"Mistakes revisited":lives>0?"Trial complete":"Your lives ran out",score,[`${right}/${i+1} correct`,`Best streak ${bestS}`],miss.length?`<li>${miss.join("</li><li>")}</li>`:"","quiz",score,isRetry?score/4:score/2+(lives>0?20:0),missedQ.length?()=>quiz(missedQ.slice()):null,isRetry);
+  onKey(e=>{if(escQuit(e))return;const n=+e.key;if(n>=1&&n<=4){const b=V.querySelectorAll(".opt")[n-1];if(b&&!b.disabled)b.click()}else if(e.key==="Enter"){const nx=document.getElementById("nx");if(nx&&document.activeElement!==nx)nx.click()}});
+  draw();
+}
+
+function tf(){
+  stop();const V=board();
+  let deck=shuffle(TF.filter(storyOK));if(deck.length<10)deck=deck.concat(shuffle(TF.filter(s=>!deck.includes(s))));
+  let i=0,t=60,score=0,streak=0,right=0,wrong=0,miss=[],busy=true;
+  V.innerHTML=`<div class="hud"><div class="l"><span class="timer" id="tm">60</span><span class="pill" id="st">Streak 0</span></div><div class="l"><span class="pill" id="sc">Score 0</span><button class="ghost" id="qx" style="min-height:36px;padding:4px 14px">Quit</button></div></div>
+  <div class="bar"><i id="tb" style="width:100%"></i></div>
+  <div id="tg"></div><div class="stmt" id="sm"></div><p class="note" id="nt" style="text-align:center;min-height:22px"></p>
+  <div class="tf"><button class="t" id="bt">True</button><button class="f" id="bf">False</button></div>
+  <p class="note" style="text-align:center">Keys: T / F or ← / →, Esc to quit. Correct +5 (more on a streak), wrong −3 seconds.</p>`;
+  const $=id=>document.getElementById(id);
+  $("qx").onclick=()=>setup();
+  const show=()=>{if(i>=deck.length){const last=deck[deck.length-1];deck=shuffle(deck);if(deck.length>1&&deck[0]===last)deck.push(deck.shift());i=0}const s=deck[i];$("tg").innerHTML=tagOf(s[0]);$("sm").textContent=s[1];$("sm").className="stmt";$("nt").textContent=""};
+  const answer=v=>{
+    if(busy||t<=0)return;busy=true;const s=deck[i],ok=s[2]===v;
+    if(ok){streak++;right++;score+=5+Math.floor(streak/3)*2;$("sm").className="stmt ok";$("nt").textContent="Correct"}
+    else{streak=0;wrong++;t=Math.max(0,t-3);$("sm").className="stmt no shake";$("nt").textContent=s[3];miss.push(`<b>${s[1]}</b><br><em>${s[2]?"True":"False"}</em> · ${s[3]}`)}
+    $("sc").textContent="Score "+score;$("st").textContent="Streak "+streak;
+    setTimeout(()=>{if(!$("sm"))return;busy=false;i++;show()},ok?350:1100);
+  };
+  $("bt").onclick=()=>answer(true);$("bf").onclick=()=>answer(false);
+  onKey(e=>{if(escQuit(e))return;const k=e.key.toLowerCase();if(k==="t"||k==="arrowleft")answer(true);if(k==="f"||k==="arrowright")answer(false)});
+  let cd=3;$("sm").textContent="Get ready… 3";
+  timer=tick(()=>{if(!$("sm"))return;cd--;if(cd>0){$("sm").textContent=`Get ready… ${cd}`;return}clearInterval(timer);busy=false;show();runClock()},1000);
+  const runClock=()=>{timer=tick(()=>{t=Math.max(0,t-1);$("tm").textContent=t;$("tb").style.width=(t/60*100)+"%";if(t<=0)results("Time is up",score,[`${right} correct`,`${wrong} wrong`],miss.length?`<li>${miss.join("</li><li>")}</li>`:"","tf",score,score)},1000)};
+}
+
+function match(){
+  stop();const V=board();
+  let p=shuffle(CARDS.filter(storyOK));if(p.length<6)p=p.concat(shuffle(CARDS.filter(c=>!p.includes(c))));
+  const set=p.slice(0,6);let sel=null,found=0,mistakes=0,sec=0,missed=new Set();
+  const L=shuffle(set.map((c,k)=>[k,c[1]])),R=shuffle(set.map((c,k)=>[k,c[2]]));
+  V.innerHTML=`<div class="hud"><div class="l"><span class="pill" id="mt">0:00</span><span class="pill" id="mm">Mistakes 0</span></div><div class="l"><span class="pill" id="mf">0/6 pairs</span><button class="ghost" id="qx" style="min-height:36px;padding:4px 14px">Quit</button></div></div>
+  <p class="note" style="margin:0 0 14px">Pick a name, then the fate that belongs to it.</p>
+  <div class="match"><div class="col">${L.map(x=>`<button class="tile" data-s="L" data-k="${x[0]}"><b>${x[1]}</b></button>`).join("")}</div>
+  <div class="col">${R.map(x=>`<button class="tile" data-s="R" data-k="${x[0]}">${x[1]}</button>`).join("")}</div></div>`;
+  const $=id=>document.getElementById(id);
+  $("qx").onclick=()=>setup();
+  onKey(e=>{if(escQuit(e))return});
+  V.querySelectorAll(".tile").forEach(b=>b.onclick=()=>{
+    if(b.classList.contains("done"))return;
+    if(!sel||sel.dataset.s===b.dataset.s){if(sel)sel.classList.remove("sel");sel=b;b.classList.add("sel");return}
+    if(sel.dataset.k===b.dataset.k){[sel,b].forEach(x=>{x.classList.remove("sel");x.classList.add("done");x.disabled=true});found++;$("mf").textContent=found+"/6 pairs";sel=null;
+      if(found===6){const score=Math.max(20,150-sec*2-mistakes*15);const ms=[...missed].map(k=>`<b>${set[k][1]}</b>: <em>${set[k][2]}</em>`);results("All fates paired",score,[`Time ${fmt(sec)}`,`${mistakes} mistakes`],ms.length?`<li>${ms.join("</li><li>")}</li>`:"","match",score,score/2)}}
+    else{mistakes++;missed.add(+(sel.dataset.s==="L"?sel:b).dataset.k);$("mm").textContent="Mistakes "+mistakes;const a=sel;[a,b].forEach(x=>{x.classList.add("shake");setTimeout(()=>x.classList.remove("shake"),400)});a.classList.remove("sel");sel=null}
+  });
+  timer=tick(()=>{sec++;$("mt").textContent=fmt(sec)},1000);
+}
+
+function cards(){
+  stop();const V=board();
+  let deck=shuffle(CARDS.filter(storyOK)),total=deck.length,kept=0,again=0,flipped=false;
+  const draw=()=>{
+    if(!deck.length){results("Deck mastered",`${kept}/${total}`,[`${again} cards reviewed again`,`+${kept*2} XP earned`],"","cards",kept,0);return}
+    const c=deck[0];flipped=false;
+    V.innerHTML=`<div class="hud"><div class="l"><span class="pill">${total-deck.length}/${total} learned</span><span class="pill">${deck.length} left</span></div><div class="l"><button class="ghost" id="ex" style="min-height:36px;padding:4px 14px">End session</button></div></div>
+    <div class="bar"><i style="width:${(total-deck.length)/total*100}%"></i></div>
+    ${tagOf(c[0])}
+    <button class="flip" id="fc" aria-label="Flip card"><div class="inner"><div class="face front">${c[1]}<small>Tap or press Space to flip</small></div><div class="face back">${c[2]}<small>${ST[c[0]]}</small></div></div></button>
+    <div class="row" style="justify-content:center"><button class="ghost" id="ag">↺ Again</button><button class="pillbtn" id="ok">✓ Got it (+2 XP)</button></div>
+    <p class="note" style="text-align:center">Keys: Space to flip, ← again, → got it, Esc to end.</p>`;
+    const fc=document.getElementById("fc");
+    fc.onclick=()=>{flipped=!flipped;fc.classList.toggle("on",flipped)};
+    document.getElementById("ag").onclick=()=>{again++;if(deck.length>1)deck.splice(Math.min(3,deck.length-1),0,deck.shift());draw()};
+    document.getElementById("ok").onclick=()=>{kept++;deck.shift();addXP(2);draw()};
+    document.getElementById("ex").onclick=()=>setup();
+  };
+  onKey(e=>{if(escQuit(e))return;if(e.key===" "){const f=document.getElementById("fc");if(f&&document.activeElement!==f){e.preventDefault();f.click()}}else if(e.key==="ArrowRight")document.getElementById("ok")?.click();else if(e.key==="ArrowLeft")document.getElementById("ag")?.click()});
+  draw();
+}
+
+document.getElementById("heroGo").onclick=start;
+document.getElementById("navGo").onclick=start;
+sigil();setup();
+}
+</script>
+</body>
+</html>
